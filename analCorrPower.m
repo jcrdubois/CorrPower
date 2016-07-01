@@ -1,5 +1,5 @@
 function power = analCorrPower(rho,alpha,N,tail)
-% USAGE: beta = analCorrPower(rho,alpha,N)
+% USAGE: power = analCorrPower(rho,alpha,N)
 % inputs
 % rho      = expected correlation
 % alpha    = threshold probability for rejecting the null hypothesis 
