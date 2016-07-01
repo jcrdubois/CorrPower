@@ -20,7 +20,7 @@ alphas = [0.05 0.01 0.001];
 c = {'k','m','r'}; % corresponding colors for plotting
 % one-sided or two-sided?
 tails  = {'right','both'};
-s = {'-','--'}; % corresponding line styles for plotting
+s = {'o-','o--'}; % corresponding line styles for plotting
 % sample sizes
 Ns = [5:50 55:5:100 110:10:200 220:20:500 550:50:1000];
 
