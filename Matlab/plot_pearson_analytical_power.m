@@ -1,20 +1,19 @@
-function power = plotAnalCorrPower(r,targetPower,alphas,tail,Nmax)
-% USAGE: power = plotAnalCorrPower(r,targetPower,alphas,tail,Nmax)
+function power = plot_pearson_analytical_power(r, targetPower, alphas, tail, Nmax)
+% USAGE: power = plot_pearson_analytical_power(r, targetPower, alphas, tail, Nmax)
 % output
 %   power [length(alphas),length(Ns)]
 % input 
 %   r: expected correlation (effect size)
 %   targetPower: how much power you want your experiment to have
 %   alphas: significance thresholds of interest
-%   tail: 'right' or 'both", depends on your hypoethesis
-%   Nmax: until what sample size to compute the iwer
-
+%   tail: 'right' or 'both", depends on your hypothesis
+%   Nmax: until what sample size to compute the power
 % make a plot of power vs. sample size
 % using the analytical power calculation for a correlation analysis
 % show results for different criteria and tails
 % 07/01/2016 Julien Dubois from scratch
-% 03/27/2019 Julien Dubois -- added input arguments, and plotting/output of
-% targetN
+% 03/27/2019 Julien Dubois -- added input arguments, and plotting/output of targetN
+% 04/10/2020 Julien Dubois -- slight cleanup
 dbstop if error
 
 % expected correlation

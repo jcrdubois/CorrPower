@@ -1,8 +1,8 @@
-function power = analCorrPower(rho,alpha,N,tail)
-% USAGE: power = analCorrPower(rho,alpha,N)
+function power = pearson_analytical_power(r, alpha, N, tail)
+% USAGE: power = pearson_analytical_power(r, alpha, N, tail)
 % inputs
-% rho      = expected correlation
-% alpha    = threshold probability for rejecting the null hypothesis 
+% r        = expected Pearson correlation (effect size)
+% alpha    = threshold p-value for rejecting the null hypothesis 
 %            (Type I error rate) 
 % N        = sample size
 % tail     = 'left', 'right' or 'both' (mirroring Matlab's nomenclature)
@@ -17,7 +17,7 @@ if nargin<4
     tail   = 'right'; % one-sided test
 end
 
-C = 0.5 * log((1+rho)./(1-rho));
+C = 0.5 * log((1+r)./(1-r));
 
 switch tail
     case {'left','right'}
