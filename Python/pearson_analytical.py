@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+from typing import List, Tuple
+import matplotlib.pylab as pl
 
 def compute_power(
     r:np.ndarray,
@@ -48,9 +50,9 @@ def compute_power(
 
 
 def plot_power(
-    r: np.ndarray = .4, 
+    rs: List[np.ndarray] = [.4], 
     target_power: float = .95, 
-    alphas: np.ndarray = [0.05, 0.01, 0.001],
+    alphas: List[np.ndarray] = [0.05, 0.01, 0.001],
     tail: str = 'right', 
     Nmax: int = 200, 
     ax = None
@@ -61,11 +63,11 @@ def plot_power(
     
     Parameters
     ----------
-    r : np.ndarray, optional
-        expected effect size, by default .4
+    rs : List[np.ndarray], optional
+        expected effect size, by default [.4]
     target_power : float, optional
         targeted power level, by default .95
-    alphas : np.ndarray, optional
+    alphas: List[np.ndarray], optional
         significance criteria to plot, by default [0.05, 0.01, 0.001]
     tail : str, optional
         tail of the statistical test, by default 'right'
@@ -76,43 +78,57 @@ def plot_power(
     
     Returns
     -------
-    np.ndarray
-        power, size [len(alphas), Nmax - 5]
-
+    Tuple[np.ndarray, np.ndarray]
+        power, size [len(rs), len(alphas), Nmax - 5]
+        target_N, size [len(rs), len(alphas)]
+        
     Example
     -------
     >>> from pearson_analytical import plot_power
     >>> power = plot_power(r=0.4)
     """    
+    if isinstance(rs, float):
+        rs = [rs]
+    rs = np.sort(rs)   
+     
     if isinstance(alphas, float):
-        alphas = np.array([alphas])
-
+        alphas = [alphas]
+    alphas = np.sort(alphas)[::-1]   
+        
     Ns = np.arange(5, Nmax+1).astype(int)
     # DO THE WORK
 
-    power = np.zeros((len(alphas),len(Ns)))
-    for i, alpha in enumerate(alphas):
-        power[i, :] = compute_power(r=r, alpha=alpha, Ns=Ns, tail=tail)
+    power = np.zeros((len(rs), len(alphas),len(Ns)))
+    for i_r, r in enumerate(rs):
+        for i_alpha, alpha in enumerate(alphas):
+            power[i_r, i_alpha, :] = compute_power(r=r, alpha=alpha, Ns=Ns, tail=tail)
 
-    target_N = np.zeros(len(alphas)).astype(int)
-    for i, alpha in enumerate(alphas):
-        indmini = np.argmin(np.abs(power[i, :] - target_power))
-        target_N[i] = Ns[indmini]
+    target_N = np.zeros((len(rs), len(alphas))).astype(int)
+    for i_r, r in enumerate(rs):
+        for i_alpha, alpha in enumerate(alphas):
+            indmini = np.argmin(np.abs(power[i_r, i_alpha, :] - target_power))
+            target_N[i_r, i_alpha] = Ns[indmini]
 
     # plot
     if ax is None:
         _, ax = plt.subplots(figsize=(10,10))
 
-    for i, alpha in enumerate(alphas):
-        ax.plot(Ns, power[i, :], label=r'$\alpha$=' + f'{alpha:.4f} -- N={target_N[i]:d}')
-        ax.axvline(x=target_N[i], color=ax.get_lines()[-1].get_color(), ls=':')
+    colors = pl.cm.jet(np.linspace(0,1,len(rs)))
+    lstyles = ['-', '--', ':']
+        
+    for i_r, r in enumerate(rs):
+        color = colors[i_r]
+        for i_alpha, alpha in enumerate(alphas):
+            lstyle=lstyles[i_alpha]
+            ax.plot(Ns, power[i_r, i_alpha, :], color=color, ls=lstyle, 
+                    label=f'r={r:.2f}, '+ r'$\alpha$=' + f'{alpha:.4f} -- N={target_N[i_r, i_alpha]:d}')
+#             ax.axvline(x=target_N[i_r, i_alpha], color=ax.get_lines()[-1].get_color(), ls=':')
 
     ax.legend()
-    ax.set_ylabel(r'analytical power ($\beta$)')
-    ax.set_xlabel('Sample size')
-    ax.set_title(f'Expected effect size: r = {r:.3f}, tail = {tail}')
+    ax.set_ylabel(r'analytical power ($\beta$)', fontsize=20)
+    ax.set_xlabel('Sample size', fontsize=20)
 
     # plot target power
     ax.axhline(y=target_power, color='k', ls=':')
 
-    return power
+    return power, target_N
